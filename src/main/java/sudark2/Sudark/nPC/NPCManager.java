@@ -10,8 +10,6 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -27,43 +25,45 @@ import static sudark2.Sudark.nPC.NPC.displays;
 import static sudark2.Sudark.nPC.NPC.main;
 
 public class NPCManager implements Listener {
-    static Location shop1 = p(124, 66, -1);
-    static Location shop2 = p(124, 66, 41);
-    static Location shop3 = p(158, 66, -1);
-    static Location shop4 = p(158, 66, 41);
+    static Location shop1 = p(13, 35, 29);
+    static Location shop2 = p(2, 35, 29);
+    static Location shop3 = p(13, 35, 33);
+    static Location shop4 = p(2, 35, 33);
 
     static Set<Location> settlements = Set.of(
-            p(107, 63, 9), p(107, 63, 31),
-            p(141, 63, 9), p(141, 63, 31),
-            p(175, 63, 9), p(175, 63, 31)
+            p(30, 37, 11), p(-14, 37, 11),
+            p(24, 38, 22), p(-8, 38, 22),
+            p(30, 40, 34), p(-15, 40, 34),
+            p(19, 41, 42), p(-4, 41, 40)
     );
 
     static Transformation huge = new Transformation(
-            new Vector3f(0, 5f, 0),            // 平移（translation）向量
+            new Vector3f(0, 3f, 0),            // 平移（translation）向量
             new Quaternionf(),  // 旋转（rotation），默认不旋转
-            new Vector3f(6f, 6f, 6f), // 缩放（scale）到 1
+            new Vector3f(2f, 2f, 2f), // 缩放（scale）到 1
             new Quaternionf()                // 旋转中心点（leftRotation），默认不旋转
     );
 
     static Transformation drama = new Transformation(
-            new Vector3f(0, 7f, 0),            // 平移（translation）向量
+            new Vector3f(0, 2f, 0),            // 平移（translation）向量
             new Quaternionf(),  // 旋转（rotation），默认不旋转
-            new Vector3f(8f, 7f, 8f), // 缩放（scale）到 1
+            new Vector3f(1.5f, 1.5f, 1.5f), // 缩放（scale）到 1
             new Quaternionf()                // 旋转中心点（leftRotation），默认不旋转
     );
 
     public static void showTime(Plugin plugin) {
-        reGenerate();
+        Bukkit.getScheduler().runTaskLater(plugin, NPCManager::reGenerate, 80L);
+
         new BukkitRunnable() {
             @Override
             public void run() {
 
                 displays.forEach(display -> {
-                    rotateDisplay((ItemDisplay) Bukkit.getEntity(display), 1.2f);
+                    rotateDisplay((ItemDisplay) Bukkit.getEntity(display), 1.4f);
                 });
 
             }
-        }.runTaskTimer(plugin, 0, 20);
+        }.runTaskTimer(plugin, 5 * 20, 20);
     }
 
     @EventHandler
@@ -71,7 +71,7 @@ public class NPCManager implements Listener {
         Player player = event.getPlayer();
         if (player.isOp() && event.getMessage().equals("regenerate")) {
             reGenerate();
-            Bukkit.broadcastMessage("NPCs have been regenerated!");
+            Bukkit.broadcastMessage("SUDARK ！ §eregenerated!");
         }
     }
 
@@ -87,9 +87,9 @@ public class NPCManager implements Listener {
         createShop(shop4, Material.BLAST_FURNACE);
         for (Location settlement : settlements) {
             if (getBanner(settlement) != null) {
-                ItemDisplay display = (ItemDisplay) settlement.getWorld().spawnEntity(settlement, EntityType.ITEM_DISPLAY);
+                ItemDisplay display = (ItemDisplay) settlement.getWorld().spawnEntity(settlement.add(0.5, 0, 0.5), EntityType.ITEM_DISPLAY);
                 display.setItemStack(getBanner(settlement));
-                display.setTransformation(drama);
+                display.setTransformation(huge);
                 display.setInterpolationDelay(0);
                 displays.add(display.getUniqueId());
             }
@@ -97,9 +97,9 @@ public class NPCManager implements Listener {
     }
 
     public static void createShop(Location loc, Material m) {
-        ItemDisplay item = (ItemDisplay) loc.getWorld().spawnEntity(loc, EntityType.ITEM_DISPLAY);
+        ItemDisplay item = (ItemDisplay) loc.getWorld().spawnEntity(loc.add(0.5, 0, 0.5), EntityType.ITEM_DISPLAY);
         item.setItemStack(new ItemStack(m));
-        item.setTransformation(huge);
+        item.setTransformation(drama);
         item.setInterpolationDelay(0);
         displays.add(item.getUniqueId());
     }
@@ -113,7 +113,6 @@ public class NPCManager implements Listener {
         display.setInterpolationDuration(20);
         display.setInterpolationDelay(0);
         display.setTransformation(tf);
-
     }
 
 
